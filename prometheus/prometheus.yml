@@ -1,0 +1,6 @@
+global:
+  scrape_interval: 15s 
+scrape_configs:
+  - job_name: 'traderecon_app'
+    static_configs:
+      - targets: ['traderecon:8000'] 
