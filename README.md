@@ -15,7 +15,7 @@ In trading firms, multiple systems (internal and external) log the same trade at
 
 Discrepancies in price, quantity, or timestamp can indicate serious issues: execution errors, data corruption, or compliance violations.
 
-**Post-Trade Engineering teams are responsible for:**
+**Goals**
 
 - Reconciling trade records across systems  
 - Detecting and flagging mismatches  
