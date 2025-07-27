@@ -1,4 +1,3 @@
-# grafana/provisioning/dashboards/dashboard.yml
 apiVersion: 1
 
 providers:
@@ -9,5 +8,4 @@ providers:
     disableDeletion: false
     editable: true
     options:
-      # This path must match the internal container path where your dashboard JSON is mounted
       path: /etc/grafana/provisioning/dashboards
