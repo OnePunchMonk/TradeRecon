@@ -231,6 +231,32 @@ Visit [http://localhost:3000/](http://localhost:3000/)
   - Password: `admin`  
 - View the pre-provisioned **TradeRecon Overview** dashboard.
 
+
+
+### ⚙️ Current Assumptions & Scaling Targets
+
+#### 📌 Assumptions
+- The reconciliation engine currently runs **per incoming trade event** via **Kafka**.
+- Input trade data is **simulated using CSV files**, acting as Kafka producers.
+- Reconciliation happens **in real-time**, not batch-based.
+
+#### 🧭 Planned Architectural Extension
+To improve observability and align with **end-of-day compliance workflows**, the pipeline run can be **automated to start using Apache Airflow** as an **alternative batch processor**, replacing Kafka for time-triggered execution.
+
+We propose a **hybrid horizontal architecture**:
+- Support **both Kafka (real-time)** and **Airflow (batch)** backends.
+- Introduce a boolean field `reconciled` to the data schema, ensuring **duplicate trades or already-matched entries are skipped** in the batch pipeline.
+
+#### 🚧 Scaling Bottleneck & Migration Target
+- Current ingestion relies on **flat CSV files**, which limits scalability and concurrency.
+- As a key future goal, migrate the ingestion and persistence layer to **MongoDB** or another scalable store.
+- This also supports transitioning from **Kafka-based real-time streaming** to **Airflow-based batch reconciliation** as needed, enabling more flexible and resilient pipelines.
+```mermaid
+graph TD
+    A[Reconcile Trades] --> B[Generate Report]
+    B --> C[Send Email]
+```
+
 ## 🧪 Future Extensions
 
 | Category       | Extension Idea              | Description                                                             |
