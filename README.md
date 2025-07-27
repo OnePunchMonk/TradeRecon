@@ -6,7 +6,7 @@ A streaming post-trade reconciliation system inspired by real-world infrastructu
 
 ## 🧠 Problem Statement
 
-In trading firms, multiple systems (internal and external) log the same trade at different times, with slight variations. These include:
+In trading systems, multiple systems (internal and external) log the same trade at different times, with slight variations. These include:
 
 - Internal trading engines  
 - Broker confirmations  

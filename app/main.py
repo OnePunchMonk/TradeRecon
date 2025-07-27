@@ -2,9 +2,9 @@ import os
 import threading
 import time
 from flask import Flask, render_template, send_file, request, jsonify
-from consumer import TradeDataConsumer
-from reconcile import ReconciliationEngine
-from report_generator import ReportGenerator
+from .consumer import TradeDataConsumer
+from .reconcile import ReconciliationEngine
+from .report_generator import ReportGenerator
 from prometheus_client import start_http_server, Counter, Gauge, Histogram
 
 app = Flask(__name__, template_folder='../reports/templates', static_folder='../reports')
@@ -91,6 +91,7 @@ def stop_consumers():
     print("All Kafka consumer threads stopped.")
 
 if __name__ == '__main__':
+    start_http_server(8000, addr='0.0.0.0')
 
     print("Prometheus metrics server started on port 8000.")
 

@@ -14,20 +14,57 @@ EXECUTIONS_CSV = os.path.join(DATA_DIR, 'executions.csv')
 CONFIRMATIONS_CSV = os.path.join(DATA_DIR, 'broker_confirmations.csv')
 PNL_SNAPSHOT_CSV = os.path.join(DATA_DIR, 'pnl_snapshot.csv')
 
+# @pytest.fixture(scope="function")
+# def in_memory_db():
+#     engine = create_engine('sqlite:///:memory:')
+#     Base.metadata.create_all(engine)
+#     Session = sessionmaker(bind=engine)
+#     session = Session()
+#     yield session
+#     session.close()
+#     Base.metadata.drop_all(engine)
+
+# @pytest.fixture(scope="function")
+# def in_memory_db():
+#     engine = create_engine('sqlite:///:memory:')
+#     Base.metadata.create_all(engine)
+#     Session = sessionmaker(bind=engine)
+#     session = Session()
+#     yield engine, session
+#     session.close()
+#     Base.metadata.drop_all(engine)
+
 @pytest.fixture(scope="function")
 def in_memory_db():
+    """ This fixture now yields ONLY the session object. """
     engine = create_engine('sqlite:///:memory:')
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
-    yield session
+    yield session  # <-- CHANGE: Yield only the session
     session.close()
     Base.metadata.drop_all(engine)
 
+
+
+# @pytest.fixture(scope="function")
+# def reconciliation_engine(in_memory_db):
+#     engine = in_memory_db.bind
+#     return ReconciliationEngine(db_url=engine.url)
+
+
+# @pytest.fixture(scope="function")
+# def reconciliation_engine(in_memory_db):
+#     engine, _ = in_memory_db
+#     return ReconciliationEngine(db_url=engine.url)
 @pytest.fixture(scope="function")
 def reconciliation_engine(in_memory_db):
-    engine = in_memory_db.bind
-    return ReconciliationEngine(db_url=engine.url)
+    """ This fixture now takes the session from in_memory_db and passes it to the engine. """
+    # in_memory_db is now the session object itself
+    shared_session = in_memory_db
+    return ReconciliationEngine(db_url='sqlite:///:memory:', db_session=shared_session)
+
+
 
 def load_and_prepare_trade_data():
     try:
@@ -134,14 +171,73 @@ def load_and_prepare_trade_data():
         ))
     return test_cases
 
+# @pytest.mark.parametrize(
+#     "trade_id, exec_data, conf_data, pnl_data, expected_status, expected_mismatches",
+#     load_and_prepare_trade_data()
+# )
 @pytest.mark.parametrize(
     "trade_id, exec_data, conf_data, pnl_data, expected_status, expected_mismatches",
     load_and_prepare_trade_data()
 )
+
+# def test_full_reconciliation_flow(
+#     reconciliation_engine, in_memory_db,
+#     trade_id, exec_data, conf_data, pnl_data, expected_status, expected_mismatches
+# ):
+#     if exec_data:
+#         reconciliation_engine.process_message('executions', exec_data)
+#     if conf_data:
+#         reconciliation_engine.process_message('confirmations', conf_data)
+#     if pnl_data:
+#         reconciliation_engine.process_message('pnl_snapshot', pnl_data)
+
+#     result = in_memory_db.query(ReconciliationResult).filter_by(trade_id=trade_id).first()
+
+#     if expected_status == 'PENDING_INCOMPLETE':
+#         assert result is None
+#     else:
+#         assert result is not None
+#         assert result.status == expected_status
+
+#         actual_mismatches_json = sorted([json.dumps(d, sort_keys=True) for d in result.mismatch_details])
+#         expected_mismatches_json = sorted([json.dumps(d, sort_keys=True) for d in expected_mismatches])
+
+#         assert actual_mismatches_json == expected_mismatches_json
+
+# def test_full_reconciliation_flow(
+#     reconciliation_engine, in_memory_db,
+#     trade_id, exec_data, conf_data, pnl_data, expected_status, expected_mismatches
+# ):
+#     # Unpack the session from the in_memory_db fixture
+#     _, session = in_memory_db
+
+#     if exec_data:
+#         reconciliation_engine.process_message('executions', exec_data)
+#     if conf_data:
+#         reconciliation_engine.process_message('confirmations', conf_data)
+#     if pnl_data:
+#         reconciliation_engine.process_message('pnl_snapshot', pnl_data)
+
+#     # Query using the shared session
+#     result = session.query(ReconciliationResult).filter_by(trade_id=trade_id).first()
+
+#     if expected_status == 'PENDING_INCOMPLETE':
+#         assert result is None
+#     else:
+#         assert result is not None
+#         assert result.status == expected_status
+
+#         actual_mismatches_json = sorted([json.dumps(d, sort_keys=True) for d in result.mismatch_details])
+#         expected_mismatches_json = sorted([json.dumps(d, sort_keys=True) for d in expected_mismatches])
+
+#         assert actual_mismatches_json == expected_mismatches_json
 def test_full_reconciliation_flow(
-    reconciliation_engine, in_memory_db,
+    reconciliation_engine, # <-- CHANGE: Remove in_memory_db, the engine fixture handles it
     trade_id, exec_data, conf_data, pnl_data, expected_status, expected_mismatches
 ):
+    # Get the shared session directly from the pre-configured engine
+    session = reconciliation_engine.db_session
+
     if exec_data:
         reconciliation_engine.process_message('executions', exec_data)
     if conf_data:
@@ -149,11 +245,13 @@ def test_full_reconciliation_flow(
     if pnl_data:
         reconciliation_engine.process_message('pnl_snapshot', pnl_data)
 
-    result = in_memory_db.query(ReconciliationResult).filter_by(trade_id=trade_id).first()
+    # This query will now work because it uses the same session as the engine
+    result = session.query(ReconciliationResult).filter_by(trade_id=trade_id).first()
 
     if expected_status == 'PENDING_INCOMPLETE':
         assert result is None
     else:
+        # This assertion should now pass
         assert result is not None
         assert result.status == expected_status
 
@@ -161,3 +259,4 @@ def test_full_reconciliation_flow(
         expected_mismatches_json = sorted([json.dumps(d, sort_keys=True) for d in expected_mismatches])
 
         assert actual_mismatches_json == expected_mismatches_json
+

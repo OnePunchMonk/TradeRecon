@@ -3,4 +3,8 @@ global:
 scrape_configs:
   - job_name: 'traderecon_app'
     static_configs:
-      - targets: ['traderecon:8000'] 
+      - targets: ['traderecon:8000']
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+             

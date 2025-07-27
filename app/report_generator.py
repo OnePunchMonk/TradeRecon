@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 import os
-from reconcile import ReconciliationResult, Base
+from .reconcile import ReconciliationResult, Base
 
 class ReportGenerator:
     def __init__(self, db_url='sqlite:///./reports/reconciliation.db', template_dir='./reports/templates'):

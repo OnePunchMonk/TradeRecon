@@ -1,7 +1,7 @@
 import threading
 import json
 from kafka import KafkaConsumer
-from reconcile import ReconciliationEngine
+from .reconcile import ReconciliationEngine
 
 class TradeDataConsumer(threading.Thread):
     def __init__(self, topic: str, bootstrap_servers: str, group_id: str, reconcile_engine: ReconciliationEngine):
