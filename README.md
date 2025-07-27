@@ -231,9 +231,26 @@ Visit [http://localhost:3000/](http://localhost:3000/)
   - Password: `admin`  
 - View the pre-provisioned **TradeRecon Overview** dashboard.
 
+## 📊 Observability and Reporting
+
+**🔍 Monitoring Metrics with Grafana**  
+Latency, bandwidth, and per-record reconciliation delays are logged and exported via Prometheus. Queue lengths and throughput metrics are visualized using **Grafana dashboards** for real-time observability and debugging.
+
+![Grafana Metrics Dashboard](./readme-screenshots/grafana.png)
 
 
-### ⚙️ Current Assumptions & Scaling Targets
+
+
+**🧾 Trade Overview Reporting with Jinja2**
+
+Reconciliation summaries are dynamically rendered using **Jinja2-powered HTML templates**. These reports include matched and mismatched trades, timestamp skews, and PnL validation outcomes.
+
+![Jinja Dashboard 1](./readme-screenshots/jinja1.png)
+
+![Jinja Dashboard 2](./readme-screenshots/jinja2.png)
+
+
+## ⚙️ Current Assumptions & Scaling Targets
 
 #### 📌 Assumptions
 - The reconciliation engine currently runs **per incoming trade event** via **Kafka**.
