@@ -1,5 +1,7 @@
 # 🔄 TradeRecon: Real-Time Trade Reconciliation Engine
 
+[![Project Status: Stable](https://img.shields.io/badge/status-stable-green.svg)](https://github.com/OnePunchMonk/TradeRecon)
+
 A streaming post-trade reconciliation system inspired by real-world infrastructure.
 
 ---
