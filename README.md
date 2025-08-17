@@ -3,7 +3,8 @@
 [![Project Status: Stable](https://img.shields.io/badge/status-stable-green.svg)](https://github.com/OnePunchMonk/TradeRecon)
 
 A streaming post-trade reconciliation system inspired by real-world infrastructure.
-
+> **System & Monitoring Metrics**
+> - ⚡ **Per-record Latency:** ~45ms  
 ---
 
 ## 🧠 Problem Statement
